@@ -871,8 +871,8 @@ void sendPhoneTelemetry() {
     sonGonderimZamani = millis();
 
     Serial.print("$HYDRO");
-    Serial.print(",P1="); Serial.print(sebekeBar, 2);
-    Serial.print(",P2="); Serial.print(tesisatBar, 2);
+    Serial.print(",P1="); Serial.print(tesisatBar, 2);
+    Serial.print(",P2="); Serial.print(sebekeBar, 2);
     Serial.print(",LVL="); Serial.print(tankLitre);
     Serial.print(",LVL_PCT="); Serial.print(tankPercent);
     Serial.print(",PUMP="); Serial.print(pumpPhysicalState ? 1 : 0);
