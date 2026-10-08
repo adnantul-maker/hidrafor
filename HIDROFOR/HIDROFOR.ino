@@ -136,7 +136,7 @@ const byte PIN_STOP        = 13;
 // TANK AYARLARI
 // ============================================================
 
-const float TANK_YUKSEKLIK_CM = 140.0;
+const float TANK_YUKSEKLIK_CM = 140.0;   // tank govde yuksekligi (bilgi; hesap dolu/bos mesafeden)
 const float TANK_KAPASITE_LITRE = 1500.0;
 
 const float TANK_DOLU_MESAFE_CM = 20.0;   // sensor 150 cm, su 130 cm
@@ -975,12 +975,18 @@ void drawTankBar() {
 
   display.setTextSize(1);
 
+  int tx;
+
   snprintf(buf, sizeof(buf), "%d%%", tankPercent);
-  display.setCursor(128 - (int)strlen(buf) * 6, 47);
+  tx = 128 - (int)strlen(buf) * 6;
+  if (tx < 0) tx = 0;
+  display.setCursor(tx, 47);
   display.print(buf);
 
   snprintf(buf, sizeof(buf), "%dL", tankLitre);
-  display.setCursor(128 - (int)strlen(buf) * 6, 56);
+  tx = 128 - (int)strlen(buf) * 6;
+  if (tx < 0) tx = 0;
+  display.setCursor(tx, 56);
   display.print(buf);
 }
 
