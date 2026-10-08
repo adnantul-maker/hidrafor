@@ -1,7 +1,20 @@
 /*
    ============================================================
    HIDROFOR KONTROL SISTEMI - ARDUINO LEONARDO
-   SURUM: v5.8
+   SURUM: v5.9
+
+   v5.9 DEGISIKLIKLER (HATA DUZELTMELERI - KONTROL CEKIRDEGI AYNI)
+   ------------------------------------------------------------
+   1. Telemetri: P1=tesisat, P2=sebeke (telefon uygulamasi eslesmesi).
+   2. Ultrasonik zaman asiminda sahte "dusuk seviye" kilidi
+      engellendi; sensor arizasi ayri raporlanir (SNS_ERR), son
+      gecerli seviye korunur. Samandira/kuru calisma korumalari
+      aynen aktiftir.
+   3. Pompa durdurma kosulu alarm debounce ile tutarli hale
+      getirildi (samandira sicramasi pompayi takirdatmaz).
+   4. Alarm debounce sayaci icin ayri aktiflik bayragi eklendi
+      (0 sentinel kaldirildi).
+   5. OLED sag-alt yuzde/litre hizalamasinda tasma kontrolu.
 
    v5.8 DEGISIKLIKLER (SADECE OLED GORUNUMU, KONTROL MANTIGI AYNI)
    ------------------------------------------------------------
@@ -375,7 +388,7 @@ void setup() {
     display.setCursor(20, 18);
     display.println("HIDROFOR");
     display.setCursor(35, 34);
-    display.println("v5.8");
+    display.println("v5.9");
     display.setCursor(20, 48);
     display.println("BASLATILIYOR");
     display.display();
