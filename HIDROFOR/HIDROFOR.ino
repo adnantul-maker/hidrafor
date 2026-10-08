@@ -645,8 +645,11 @@ void processLogic() {
     alarmDebounceTimer = 0;
   }
 
-  // userStopped aktifse otomatik mantik pompayi baslatmaz
-  if (debouncedAlarmState || zeroPressureLock || lowLevelLock || samandiraHata || userStopped) {
+  // samandiraHata, levelAlarmState -> rawAlarmCondition -> debouncedAlarmState
+  // zincirinde zaten yer aliyor; burada tekrar ham bayraga bakmak
+  // debounce tutarsizligi yaratiyordu. Latches (kuru/dusuk seviye)
+  // aninda, samandira ise 1 sn debounce ile degerlendirilir.
+  if (debouncedAlarmState || zeroPressureLock || lowLevelLock || userStopped) {
     pumpDesiredState = false;
     pumpStartTiming = false;
     pumpStopTiming = false;
