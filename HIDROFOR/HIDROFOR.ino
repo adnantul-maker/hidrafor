@@ -233,6 +233,7 @@ bool levelAlarmState = false;
 bool lowLevelLock    = false;
 
 bool samandiraHata = false;
+bool tankSensorFault = false;   // ultrasonik gecersiz okuma (seviye bilinmiyor)
 
 bool userStopped = false;
 
@@ -512,8 +513,18 @@ float readUltrasonicDistance() {
 int readTankPercent() {
   float mesafe = readUltrasonicDistance();
 
-  // Tank bossa veya mesafe tank yuksekliginden fazlaysa -> BOS
-  if (mesafe >= TANK_BOS_MESAFE_CM || mesafe == 999.0) {
+  // Gecersiz / zaman asimi okuma: sensor arizasi kabul edilir.
+  // Seviye bilinmedigi icin yanlis "dusuk seviye" alarmi uretilmez;
+  // onceki gecerli deger korunur. (Samandira ve kuru calisma korumasi
+  // yine de aktiftir.)
+  if (mesafe >= 500.0) {          // 999.0 = pulseIn timeout isareti
+    tankSensorFault = true;
+    return tankPercent;
+  }
+  tankSensorFault = false;
+
+  // Tank bossa -> %0
+  if (mesafe >= TANK_BOS_MESAFE_CM) {
     return 0;
   }
 
@@ -553,13 +564,17 @@ void readSensors() {
       levelAlarmState = true;
     }
 
-    if (tankPercent < TANK_DURDURMA_YUZDE) {
-      lowLevelLock = true;
-      levelAlarmState = true;
-    }
+    // Ultrasonik arizaliysa seviye bilinmiyor: yanlis "dusuk seviye"
+    // kilidi uretme, mevcut kilit durumunu koru.
+    if (!tankSensorFault) {
+      if (tankPercent < TANK_DURDURMA_YUZDE) {
+        lowLevelLock = true;
+        levelAlarmState = true;
+      }
 
-    if (tankPercent >= TANK_BASLATMA_YUZDE) {
-      lowLevelLock = false;
+      if (tankPercent >= TANK_BASLATMA_YUZDE) {
+        lowLevelLock = false;
+      }
     }
 
     if (!samandiraHata && !lowLevelLock) {
@@ -880,6 +895,7 @@ void sendPhoneTelemetry() {
     Serial.print(",ALM_DRY="); Serial.print(zeroPressureLock ? 1 : 0);
     Serial.print(",ALM_LOW="); Serial.print(lowLevelLock ? 1 : 0);
     Serial.print(",ALM_FLT="); Serial.print(samandiraHata ? 1 : 0);
+    Serial.print(",SNS_ERR="); Serial.print(tankSensorFault ? 1 : 0);
     Serial.print(",ALM_MUTE="); Serial.print(alarmMuted ? 1 : 0);
     Serial.print(",USER_STOP="); Serial.print(userStopped ? 1 : 0);
     Serial.print("\r\n");
