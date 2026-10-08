@@ -254,6 +254,7 @@ unsigned long alarmDebounceTimer = 0;
 
 bool rawAlarmCondition = false;
 bool debouncedAlarmState = false;
+bool alarmDebounceActive = false;   // sayac aktif mi (0 sentinel yerine)
 
 
 // ============================================================
@@ -602,6 +603,7 @@ void processLogic() {
     rawAlarmCondition = false;
     debouncedAlarmState = false;
     alarmDebounceTimer = 0;
+    alarmDebounceActive = false;
     alarmMuted = false;
 
     applyPumpState();
@@ -635,14 +637,15 @@ void processLogic() {
   rawAlarmCondition = zeroPressureLock || levelAlarmState;
 
   if (rawAlarmCondition != debouncedAlarmState) {
-    if (alarmDebounceTimer == 0) {
+    if (!alarmDebounceActive) {
+      alarmDebounceActive = true;
       alarmDebounceTimer = millis();
     } else if (millis() - alarmDebounceTimer >= ALARM_DEBOUNCE_TIME) {
       debouncedAlarmState = rawAlarmCondition;
-      alarmDebounceTimer = 0;
+      alarmDebounceActive = false;
     }
   } else {
-    alarmDebounceTimer = 0;
+    alarmDebounceActive = false;
   }
 
   // samandiraHata, levelAlarmState -> rawAlarmCondition -> debouncedAlarmState
@@ -786,6 +789,7 @@ void checkButtons() {
     alarmMuted = false;
     debouncedAlarmState = false;
     alarmDebounceTimer = 0;
+    alarmDebounceActive = false;
     setUserStopped(false);
   }
 
@@ -869,6 +873,7 @@ void handleCommand(const char* komut) {
     alarmMuted = false;
     debouncedAlarmState = false;
     alarmDebounceTimer = 0;
+    alarmDebounceActive = false;
     setUserStopped(false);
   } else if (strcmp(komut, "$MUTE") == 0 || strcmp(komut, "MUTE") == 0) {
     alarmMuted = true;
